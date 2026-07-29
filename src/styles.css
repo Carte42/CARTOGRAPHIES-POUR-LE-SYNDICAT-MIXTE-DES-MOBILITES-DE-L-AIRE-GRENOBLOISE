@@ -1,0 +1,161 @@
+/* Couleurs de la charte SMMAG, employées comme sur les planches. Les polices
+   de la charte ne sont pas embarquées : leurs sous-ensembles proviennent des
+   PDF publiés par le SMMAG et n'ont pas à être republiés. */
+:root {
+  --noir: #231F20;
+  --gris: #939598;
+  --gris-fonce: #5F6163;
+  --gris-clair: #D7D8DA;
+  --jaune: #FFF200;
+  --jaune-clair: #FFF78F;
+  --bleu-m: #2D2C73;
+  --bleu: #0C9DD9;
+  --fond: #FBFBF9;
+  --panneau: 400px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  color: var(--noir);
+  background: var(--fond);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.attente {
+  height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px; color: var(--gris-fonce);
+}
+.marque {
+  font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  font-size: 12px; color: var(--bleu-m);
+}
+
+.page { display: flex; height: 100vh; overflow: hidden; }
+
+/* ------------------------------------------------------------------ panneau */
+.panneau {
+  width: var(--panneau); flex: 0 0 var(--panneau); height: 100vh;
+  overflow-y: auto; background: #fff; border-right: 1px solid var(--gris-clair);
+  padding: 20px 22px 60px;
+}
+.panneau header { border-bottom: 3px solid var(--jaune); padding-bottom: 12px; }
+.panneau h1 { font-size: 23px; line-height: 1.15; margin-top: 4px; }
+.sous-titre { color: var(--gris-fonce); margin-top: 4px; }
+.panneau section { margin-top: 20px; }
+.panneau h2 {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--gris-fonce); margin-bottom: 8px;
+}
+
+.mode-emploi p { color: var(--gris-fonce); }
+.mode-emploi ol { margin: 8px 0 0 18px; }
+.mode-emploi li { margin-bottom: 3px; }
+
+.chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chiffres div {
+  background: var(--fond); border: 1px solid var(--gris-clair);
+  border-radius: 8px; padding: 10px 12px;
+}
+.chiffres strong { display: block; font-size: 21px; line-height: 1.1; }
+.chiffres span { color: var(--gris-fonce); font-size: 12px; }
+
+.fiche {
+  position: relative; border: 2px solid var(--noir); border-radius: 10px;
+  padding: 14px 16px;
+}
+.fiche h2 { font-size: 18px; text-transform: none; letter-spacing: 0; color: var(--noir); }
+.fiche .famille { color: var(--gris-fonce); font-size: 12px; margin-bottom: 8px; }
+.fiche dl > div { display: flex; justify-content: space-between; padding: 2px 0; }
+.fiche dt { color: var(--gris-fonce); }
+.fiche dd { font-weight: 700; }
+.fermer {
+  position: absolute; top: 8px; right: 10px; border: 0; background: none;
+  font-size: 20px; cursor: pointer; color: var(--gris);
+}
+
+.chapeau { color: var(--gris-fonce); margin-bottom: 10px; }
+.corridor { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+.lettre {
+  flex: 0 0 24px; height: 24px; border-radius: 50%; color: #fff;
+  font-weight: 800; display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.desserte { cursor: pointer; }
+.desserte em { color: var(--gris-fonce); font-style: normal; font-size: 12px; }
+.desserte.actif { background: var(--jaune); }
+
+.liste table { width: 100%; border-collapse: collapse; }
+.liste tr { cursor: pointer; border-bottom: 1px solid #F0F0EE; }
+.liste tr.survol { background: var(--jaune-clair); }
+.liste tr.choisi { background: var(--jaune); }
+.liste td { padding: 4px 2px; }
+.nombre { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gris { color: var(--gris-fonce); }
+.pastille-liste { width: 16px; }
+.pastille-liste span { display: block; width: 10px; height: 10px; border-radius: 50%; }
+
+.legende div { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.legende .trait { width: 22px; height: 4px; border-radius: 2px; flex: 0 0 22px; }
+.legende em { margin-left: auto; color: var(--gris-fonce); font-style: normal; font-size: 12px; }
+
+.methode p { color: var(--gris-fonce); margin-bottom: 8px; }
+.methode .mention { font-size: 12px; color: var(--gris); }
+.lien {
+  border: 0; background: none; padding: 0; color: var(--bleu-m);
+  text-decoration: underline; cursor: pointer; font: inherit;
+}
+
+/* -------------------------------------------------------------------- scène */
+.scene { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.barre {
+  display: flex; align-items: center; gap: 16px; padding: 10px 16px;
+  border-bottom: 1px solid var(--gris-clair); background: #fff; flex-wrap: wrap;
+}
+.onglets button, .fonds button {
+  border: 1px solid var(--gris-clair); background: #fff; border-radius: 6px;
+  padding: 6px 12px; cursor: pointer; font: inherit; margin-right: 6px;
+}
+.onglets button.actif { background: var(--noir); color: #fff; border-color: var(--noir); }
+.fonds button.actif { background: var(--jaune); border-color: var(--noir); }
+.indication { margin-left: auto; color: var(--gris-fonce); font-size: 13px; }
+
+.vue { flex: 1; min-height: 0; position: relative; }
+.carte { position: absolute; inset: 0; background: #EDEDE8; }
+.cadre-etoile {
+  position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: center; background: #fff; padding: 10px;
+}
+.etoile { width: min(100%, 96vh); height: auto; }
+.jalon-etoile { cursor: pointer; }
+.nom-etoile { paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+
+/* ------------------------------------------------------------------ Leaflet */
+.leaflet-container { font: inherit; background: #EDEDE8; }
+.jalon { pointer-events: auto; }
+.jalon .pastille {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 50%; color: #fff; font-weight: 700;
+  font-size: 11px; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+  transform: translate(-12px, -12px); cursor: pointer;
+}
+.jalon .nom {
+  position: absolute; left: 16px; top: -9px; white-space: nowrap;
+  font-size: 12px; font-weight: 600; color: var(--noir);
+  paint-order: stroke; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 5px #fff;
+  pointer-events: none;
+}
+.jalon.terminus .nom { font-weight: 800; }
+.depart span {
+  display: block; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--noir); border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5); cursor: grab;
+}
+
+@media (max-width: 900px) {
+  .page { flex-direction: column; height: auto; }
+  .panneau { width: 100%; flex: none; height: auto; border-right: 0; }
+  .scene { height: 80vh; }
+}
