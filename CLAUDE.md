@@ -139,6 +139,9 @@ l'écran et 10 sur la planche jointe n'y verra pas une nuance de méthode.
 ## Honnêteté de la démonstration
 
 Le bandeau « Données et méthode » énonce les sources, la vitesse retenue, le
-contrôle contre la Chrono-map SMMAG 2021, et dit que **la page n'est pas un
-livrable du marché**. Ne pas le retirer : la valeur de la pièce tient à ce
+contrôle contre la Chrono-map SMMAG 2021, dit que **la page n'est pas un livrable
+du marché** et que **la charte et le logo du SMMAG sont repris pour les seuls
+besoins de la démonstration** (les deux logos, donneur d'ordre puis candidat,
+sont en haut à droite depuis le 30/07/2026 ; cette mention est la contrepartie de
+leur présence, comme le filigrane l'est sur les planches). Ne pas le retirer : la valeur de la pièce tient à ce
 qu'elle montre une méthode, pas à ce qu'elle passe pour un produit fini.

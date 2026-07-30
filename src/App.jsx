@@ -117,6 +117,15 @@ export default function App() {
                       onClick={() => setReseau((r) => !r)}>Réseau cyclable</button>
             </div>
           )}
+          {/* Logo du donneur d'ordre puis celui du candidat, au premier rang de la
+              barre pour tenir le coin haut droit. La reprise du logo SMMAG pour
+              les besoins de la démonstration est dite dans « Données et
+              méthode ». L'indication de départ passe au rang suivant. */}
+          <div className="logos">
+            <img src={`${import.meta.env.BASE_URL}logos/smmag.png`} alt="SMMAG" />
+            <img src={`${import.meta.env.BASE_URL}logos/carte42.png`} alt="Carte 42" />
+          </div>
+
           <p className="indication">
             {depart.libre
               ? <>Départ libre, accroché au réseau à {Math.round(depart.ecart_m)} m.{' '}

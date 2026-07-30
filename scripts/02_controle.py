@@ -60,12 +60,16 @@ def main():
 
         # le départ doit vraiment changer le résultat, sinon la démonstration
         # ne démontre rien
+        # La liste des corridors est le témoin : elle est recomposée à chaque
+        # départ, et elle reste visible (elle n'est pas dans un bloc repliable,
+        # contrairement à la liste des destinations, dont `inner_text` ne rendrait
+        # rien une fois refermée).
         page.get_by_role("button", name="Carte", exact=True).click()
         page.wait_for_timeout(600)
-        avant = page.inner_text(".chiffres")
+        avant = page.inner_text(".corridors")
         page.mouse.click(1150, 780)
         page.wait_for_timeout(1200)
-        apres = page.inner_text(".chiffres")
+        apres = page.inner_text(".corridors")
         page.screenshot(path=os.path.join(CAPTURES, "depart-deplace.png"))
         n.close()
 
@@ -78,7 +82,7 @@ def main():
         ennuis.append("tracés discontinus : %.1f m au raccord (%s)"
                       % (raccords["m"], raccords["ou"]))
     if avant == apres:
-        ennuis.append("déplacer le départ n'a rien changé aux chiffres")
+        ennuis.append("déplacer le départ n'a rien changé aux corridors")
     if erreurs:
         ennuis.append("erreurs de page : %s" % " | ".join(erreurs))
 

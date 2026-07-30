@@ -54,14 +54,6 @@ body {
 .mode-emploi ol { margin: 8px 0 0 18px; }
 .mode-emploi li { margin-bottom: 3px; }
 
-.chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.chiffres div {
-  background: var(--fond); border: 1px solid var(--gris-clair);
-  border-radius: 8px; padding: 10px 12px;
-}
-.chiffres strong { display: block; font-size: 21px; line-height: 1.1; }
-.chiffres span { color: var(--gris-fonce); font-size: 12px; }
-
 .fiche {
   position: relative; border: 2px solid var(--noir); border-radius: 10px;
   padding: 14px 16px;
@@ -120,7 +112,36 @@ body {
 }
 .onglets button.actif { background: var(--noir); color: #fff; border-color: var(--noir); }
 .fonds button.actif { background: var(--jaune); border-color: var(--noir); }
-.indication { margin-left: auto; color: var(--gris-fonce); font-size: 13px; }
+/* L'indication occupe tout un rang : la barre fait donc deux lignes, les
+   sélecteurs et les logos au premier, l'indication au second, à droite. */
+.indication {
+  flex-basis: 100%; margin: 0; text-align: right;
+  color: var(--gris-fonce); font-size: 13px;
+}
+.logos {
+  margin-left: auto; display: flex; align-items: center; gap: 16px;
+  flex: 0 0 auto; padding-left: 18px; border-left: 1px solid var(--gris-clair);
+}
+.logos img { height: 34px; width: auto; display: block; }
+/* le logo SMMAG est bien plus large que haut : à hauteur égale il écraserait
+   le second, on l'aligne sur la hauteur optique et non sur la boîte */
+.logos img[alt='SMMAG'] { height: 26px; }
+
+/* sections repliables du panneau */
+.panneau details > summary {
+  cursor: pointer; list-style: none; display: flex; align-items: center;
+  gap: 8px; padding: 4px 0;
+}
+.panneau details > summary::-webkit-details-marker { display: none; }
+.panneau details > summary::before {
+  content: '▸'; color: var(--gris); font-size: 11px; flex: 0 0 auto;
+}
+.panneau details[open] > summary::before { content: '▾'; }
+.panneau details > summary h2 { margin: 0; }
+.panneau details > summary h2 em {
+  font-style: normal; color: var(--gris); margin-left: 4px;
+}
+.panneau details > summary:hover h2 { color: var(--noir); }
 
 .vue { flex: 1; min-height: 0; position: relative; }
 .carte { position: absolute; inset: 0; background: #EDEDE8; }

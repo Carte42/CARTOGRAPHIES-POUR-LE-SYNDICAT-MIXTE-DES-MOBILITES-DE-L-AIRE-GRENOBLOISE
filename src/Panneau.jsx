@@ -1,9 +1,5 @@
 import { AMENAGEMENTS, FAMILLES } from './lib/charte.js'
 
-function minutes(v) {
-  return `${Math.round(v)} min`
-}
-
 /** Nombre décimal à la française : la virgule, sur une pièce de marché public. */
 function nb(v, d = 2) {
   return v.toLocaleString('fr-FR', { minimumFractionDigits: d,
@@ -36,13 +32,6 @@ export default function Panneau({ donnees, resultat, depart, controle, survol,
           <li>Les {resume.destinations} destinations et les corridors se recalculent.</li>
           <li>L'onglet « Spidermap » montre la planche recomposée pour ce départ.</li>
         </ol>
-      </section>
-
-      <section className="chiffres">
-        <div><strong>{resume.communes_sous30}</strong><span>communes à moins de 30 min</span></div>
-        <div><strong>{minutes(resume.minutes_max)}</strong><span>pour la plus lointaine</span></div>
-        <div><strong>{Math.round(100 * resume.part_amenagee)} %</strong><span>du trajet type sur aménagement</span></div>
-        <div><strong>{resume.detour_median ? nb(resume.detour_median, 2) : '—'} ×</strong><span>le vol d'oiseau</span></div>
       </section>
 
       {choisie && (
@@ -86,8 +75,10 @@ export default function Panneau({ donnees, resultat, depart, controle, survol,
         ))}
       </section>
 
-      <section className="liste">
-        <h2>Toutes les destinations</h2>
+      {/* Repliables : la liste sert à lire, la méthode sert à justifier. On ouvre
+          la première, on referme la seconde. */}
+      <details className="liste" open>
+        <summary><h2>Toutes les destinations <em>{dessertes.length}</em></h2></summary>
         <table>
           <tbody>
             {dessertes.map((d) => (
@@ -106,7 +97,7 @@ export default function Panneau({ donnees, resultat, depart, controle, survol,
             ))}
           </tbody>
         </table>
-      </section>
+      </details>
 
       <section className="legende">
         <h2>Le réseau dessiné</h2>
@@ -119,8 +110,8 @@ export default function Panneau({ donnees, resultat, depart, controle, survol,
         ))}
       </section>
 
-      <section className="methode">
-        <h2>Données et méthode</h2>
+      <details className="methode">
+        <summary><h2>Données et méthode</h2></summary>
         <p>
           Itinéraires calculés sur le réseau viaire d'OpenStreetMap
           ({meta.graphe.sommets.toLocaleString('fr-FR')} sommets,
@@ -145,17 +136,18 @@ export default function Panneau({ donnees, resultat, depart, controle, survol,
         <p className="mention">
           Démonstrateur produit par Carte 42 pour la consultation
           {' '}{meta.consultation}. Il n'est pas un livrable du marché : les
-          livrables sont les planches imprimées et leurs fichiers sources. Le
-          tracé affiché est simplifié à {meta.tolerance_trace_m} m pour
-          l'affichage ; les longueurs et les durées sont calculées sur la
-          géométrie complète.
+          livrables sont les planches imprimées et leurs fichiers sources. La
+          charte graphique et le logo du SMMAG sont repris pour les seuls besoins
+          de la démonstration. Le tracé affiché est simplifié à
+          {' '}{meta.tolerance_trace_m} m ; les longueurs et les durées sont
+          calculées sur la géométrie complète.
         </p>
         {depart.libre && (
           <button className="lien" onClick={onRevenir}>
             revenir au départ de la planche
           </button>
         )}
-      </section>
+      </details>
     </aside>
   )
 }
