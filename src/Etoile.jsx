@@ -32,15 +32,30 @@ function directionsLibres(angles) {
     .map((s) => s.angle)
 }
 
-/** Point d'un cercle posé dans une direction dégagée ET dans le cadre : sans
- *  cette seconde condition, la graduation des grands anneaux sort de la page. */
-function poserSurAnneau(r, directions, cadre) {
+function dansLeCadre(x, y, cadre) {
+  return x > cadre[0] + 30 && x < cadre[0] + cadre[2] - 30 &&
+         y > cadre[1] + 18 && y < cadre[1] + cadre[3] - 10
+}
+
+/** Une seule direction pour toute la graduation : dégagée, et qui garde dans le
+ *  cadre le plus d'anneaux possible.
+ *
+ *  Choisir la direction anneau par anneau, comme on le faisait d'abord, éparpille
+ *  « 15 min » au nord et « 90 min » au nord-est : la graduation cesse de se lire
+ *  comme une échelle. Le cadre étant rectangulaire et contenant le centre, un
+ *  anneau qui tient dans une direction y fait tenir tous les plus petits.
+ */
+function directionGraduation(rayons, directions, cadre) {
+  let meilleure = directions[0], mieux = -1
   for (const a of directions) {
-    const x = r * Math.sin(a), y = -r * Math.cos(a)
-    if (x > cadre[0] + 30 && x < cadre[0] + cadre[2] - 30 &&
-        y > cadre[1] + 18 && y < cadre[1] + cadre[3] - 10) return { x, y }
+    let n = 0
+    for (const r of rayons) {
+      if (dansLeCadre(r * Math.sin(a), -r * Math.cos(a), cadre)) n++
+    }
+    if (n > mieux) { mieux = n; meilleure = a }
+    if (n === rayons.length) break
   }
-  return null
+  return meilleure
 }
 
 export default function Etoile({ resultat, nomDepart, vitesse, survol, selection,
@@ -129,10 +144,24 @@ export default function Etoile({ resultat, nomDepart, vitesse, survol, selection
                    x1 - x0 + 2 * marge, y1 - y0 + 2 * marge + 46]
 
     const directions = directionsLibres(jalons.map((j) => j.a))
-    const anneaux = ANNEAUX.filter((m) => m <= maxMin).map((m) => ({
-      m, r: m * echelle,
-      pose: poserSurAnneau(m * echelle, directions, cadre),
-    }))
+    const minutesAnneaux = ANNEAUX.filter((m) => m <= maxMin)
+    const dir = directionGraduation(minutesAnneaux.map((m) => m * echelle),
+                                    directions, cadre)
+    // Une graduation posée pile sur un jalon disparaît sous sa pastille : on la
+    // fait glisser LE LONG de son anneau, en restant dans le même secteur pour
+    // que l'échelle continue de se lire d'un seul coup d'œil.
+    const anneaux = minutesAnneaux.map((m) => {
+      const r = m * echelle
+      let pose = null
+      for (const ecart of [0, 3, -3, 6, -6, 10, -10, 15, -15, 21, -21, 28, -28]) {
+        const a = dir + (ecart * Math.PI) / 180
+        const x = r * Math.sin(a), y = -r * Math.cos(a)
+        if (!dansLeCadre(x, y, cadre)) continue
+        const gene = jalons.some((j) => Math.abs(j.x - x) < 34 && Math.abs(j.y - y) < 20)
+        if (!gene) { pose = { x, y }; break }
+      }
+      return { m, r, pose }
+    })
 
     return { branches, jalons, lettres, echelle, cadre, anneaux }
   }, [resultat])
