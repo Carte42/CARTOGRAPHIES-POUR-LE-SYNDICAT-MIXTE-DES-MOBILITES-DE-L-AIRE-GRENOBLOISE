@@ -14,8 +14,8 @@ export default function Panneau({ donnees, resultat, depart, controle, survol,
 
   return (
     <aside className="panneau">
+      {/* Pas de mention « Carte 42 » ici : le logo en haut à droite la porte. */}
       <header>
-        <p className="marque">Carte 42</p>
         <h1>Temps de parcours à vélo</h1>
         <p className="sous-titre">Aire grenobloise · depuis {depart.libre
           ? 'un départ choisi' : meta.centre.nom}</p>
@@ -75,9 +75,9 @@ export default function Panneau({ donnees, resultat, depart, controle, survol,
         ))}
       </section>
 
-      {/* Repliables : la liste sert à lire, la méthode sert à justifier. On ouvre
-          la première, on referme la seconde. */}
-      <details className="liste" open>
+      {/* Repliables, refermés par défaut : la colonne s'ouvre sur les corridors,
+          qui sont le sujet, et le lecteur déploie ce qu'il veut. */}
+      <details className="liste">
         <summary><h2>Toutes les destinations <em>{dessertes.length}</em></h2></summary>
         <table>
           <tbody>
