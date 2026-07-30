@@ -21,7 +21,7 @@ D'où le parti pris, et le geste unique : **le point de départ n'est plus figé
 La planche `cart_3_2` jointe à l'offre fige la gare de Grenoble ; ici on déplace
 le point noir et les 48 destinations, les 8 corridors et le diagramme en étoile
 se recomposent, sur le même graphe et avec les mêmes coûts. Le recalcul complet
-prend **13 ms**.
+prend **13 à 42 ms** selon la charge de la machine, relevé par le contrôle.
 
 Ni calculateur d'itinéraire personnel, ni sélecteur de trajet : le SMMAG n'achète
 pas une application grand public.
