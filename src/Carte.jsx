@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { BLANC, NOIR, AMENAGEMENTS } from './lib/charte.js'
+import { BLANC, NOIR, AMENAGEMENTS, RESEAU } from './lib/charte.js'
 import { orienter } from './lib/graphe.js'
 
 // Fonds de la Géoplateforme, sans clé. Ils sont atténués par filtre CSS : le
@@ -67,6 +67,7 @@ export default function Carte({ donnees, geometrie, resultat, fond, reseau, surv
   const carte = useRef(null)
   const tuiles = useRef(null)
   const couches = useRef({})
+  const rendus = useRef({})
   const depart = useRef(null)
 
   // --- création, une fois
@@ -78,6 +79,25 @@ export default function Carte({ donnees, geometrie, resultat, fond, reseau, surv
       preferCanvas: true,
     })
     carte.current = c
+
+    // Une pane et un canevas par couche, avec un z-index explicite.
+    //
+    // Sans cela, l'empilement se réglait par `bringToBack()` appliqué à chaque
+    // polyligne du groupe, ce qui l'inverse : chaque appel envoie l'objet tout au
+    // fond, donc le DERNIER traité finit dessous. Les liserés blancs, ajoutés
+    // avant leur trait, se retrouvaient donc PAR-DESSUS lui et l'effaçaient. Le
+    // réseau cyclable existait bien à l'écran, mais sous la forme de bandes
+    // blanchâtres : c'est l'origine du « le réseau ne se voit pas très bien ».
+    for (const [nom, z] of [['reseau', 400], ['branches', 450],
+                            ['surbrillance', 475]]) {
+      c.createPane(nom)
+      c.getPane(nom).style.zIndex = String(z)
+    }
+    rendus.current = {
+      reseau: L.canvas({ pane: 'reseau' }),
+      branches: L.canvas({ pane: 'branches' }),
+      surbrillance: L.canvas({ pane: 'surbrillance' }),
+    }
     couches.current = {
       amenagements: L.layerGroup().addTo(c),
       branches: L.layerGroup().addTo(c),
@@ -115,14 +135,17 @@ export default function Carte({ donnees, geometrie, resultat, fond, reseau, surv
       const lignes = donnees.reference.amenagements[t.cle] || []
       for (const l of lignes) {
         const pts = l.map((p) => [p[1], p[0]])
-        L.polyline(pts, { color: BLANC, weight: t.epaisseur + 1.4, opacity: 0.4,
-                          interactive: false }).addTo(g)
-        L.polyline(pts, { color: t.couleur, weight: t.epaisseur * 0.8, opacity: 0.55,
-                          interactive: false }).addTo(g)
+        // liseré blanc continu sous le trait, même sous un tireté : c'est lui qui
+        // détache le réseau du fond, clair comme sombre
+        L.polyline(pts, { color: BLANC, weight: t.epaisseur + 2.4, opacity: 0.85,
+                          interactive: false, renderer: rendus.current.reseau,
+                          pane: 'reseau' }).addTo(g)
+        L.polyline(pts, { color: RESEAU, weight: t.epaisseur, opacity: 1,
+                          dashArray: t.tirets || undefined,
+                          interactive: false, renderer: rendus.current.reseau,
+                          pane: 'reseau' }).addTo(g)
       }
     }
-    g.eachLayer((l) => l.bringToBack())
-    if (tuiles.current) tuiles.current.bringToBack()
   }, [donnees, reseau])
 
   // --- branches des corridors, redessinées à chaque départ
@@ -138,9 +161,11 @@ export default function Carte({ donnees, geometrie, resultat, fond, reseau, surv
       const k = corridors.sousDestinations(l.vers).length
       const poids = 2.6 + 0.9 * Math.sqrt(Math.max(k, 1))
       L.polyline(pts, { color: BLANC, weight: poids + 2.4, opacity: 0.85,
-                        interactive: false, lineCap: 'round' }).addTo(g)
+                        interactive: false, lineCap: 'round',
+                        renderer: rendus.current.branches, pane: 'branches' }).addTo(g)
       L.polyline(pts, { color: corridors.couleur.get(l.vers), weight: poids,
-                        opacity: 1, interactive: false, lineCap: 'round' }).addTo(g)
+                        opacity: 1, interactive: false, lineCap: 'round',
+                        renderer: rendus.current.branches, pane: 'branches' }).addTo(g)
     }
   }, [resultat, geometrie])
 
@@ -183,9 +208,13 @@ export default function Carte({ donnees, geometrie, resultat, fond, reseau, surv
     const pts = coudre(traceChemin(donnees.G, geometrie, d.chemin))
     if (pts.length < 2) return
     L.polyline(pts, { color: NOIR, weight: 10, opacity: 0.28,
-                      interactive: false, lineCap: 'round' }).addTo(g)
+                      interactive: false, lineCap: 'round',
+                      renderer: rendus.current.surbrillance,
+                      pane: 'surbrillance' }).addTo(g)
     L.polyline(pts, { color: BLANC, weight: 4.2, opacity: 1,
-                      interactive: false, dashArray: '1 7', lineCap: 'round' }).addTo(g)
+                      interactive: false, dashArray: '1 7', lineCap: 'round',
+                      renderer: rendus.current.surbrillance,
+                      pane: 'surbrillance' }).addTo(g)
   }, [survol, selection, resultat, geometrie])
 
   // --- point de départ, déplaçable

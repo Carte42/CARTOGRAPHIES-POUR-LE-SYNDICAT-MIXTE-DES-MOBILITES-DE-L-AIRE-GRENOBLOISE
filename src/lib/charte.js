@@ -28,12 +28,29 @@ export const LETTRES = 'ABCDEFGH'
 
 // Les cinq types de la couche cyclable de la Métropole, dans l'ordre de lecture
 // de la légende des planches.
+//
+// **Le réseau est monochrome ici, et c'est un choix.** Sur les planches, ces cinq
+// types se distinguent par la couleur ; mais la palette des corridors sort de la
+// même charte, et les deux couches ne coexistent sur aucun livrable : la planche
+// de secteur porte le réseau, la spidermap porte les corridors. Superposées, un
+// aménagement bleu et le corridor B bleu deviennent indiscernables à traits fins.
+// La couleur est donc réservée aux corridors, qui sont le sujet de la page, et le
+// réseau se lit par la graisse et par le motif du trait, sa hiérarchie propre
+// restant intacte : Chronovélo, voie verte, aménagement, puis les deux familles
+// sans aménagement propre, en tireté et en pointillé.
+// Anthracite, entre le gris de texte de la charte et son noir. Mesuré : en gris
+// moyen (#5F6163) à 80 % d'opacité, le réseau ne se détachait du Plan IGN que de
+// 31 niveaux de gris sur 255, c'est-à-dire pas assez pour se voir. La lisibilité
+// d'un décor tient au contraste de VALEUR, pas de teinte : sombre et opaque sous
+// des corridors clairs et colorés, la séparation des deux couches est nette.
+export const RESEAU = '#3D4043'
+
 export const AMENAGEMENTS = [
-  { cle: 'chronovelo', nom: 'Chronovélo', couleur: ROSE, epaisseur: 3.2 },
-  { cle: 'voieverte', nom: 'Voie verte', couleur: VERT_FONCE, epaisseur: 2.6 },
-  { cle: 'veloamenage', nom: 'Aménagement cyclable', couleur: BLEU, epaisseur: 2.2 },
-  { cle: 'velononamenage', nom: 'Itinéraire sans aménagement', couleur: BLEU_CLAIR, epaisseur: 1.6 },
-  { cle: 'velodifficile', nom: 'Section difficile', couleur: ORANGE, epaisseur: 1.6 },
+  { cle: 'chronovelo', nom: 'Chronovélo', epaisseur: 3.4, tirets: null },
+  { cle: 'voieverte', nom: 'Voie verte', epaisseur: 2.6, tirets: null },
+  { cle: 'veloamenage', nom: 'Aménagement cyclable', epaisseur: 1.9, tirets: null },
+  { cle: 'velononamenage', nom: 'Itinéraire sans aménagement', epaisseur: 1.9, tirets: '7 4' },
+  { cle: 'velodifficile', nom: 'Section difficile', epaisseur: 1.9, tirets: '1.5 3.5' },
 ]
 
 export const FAMILLES = {

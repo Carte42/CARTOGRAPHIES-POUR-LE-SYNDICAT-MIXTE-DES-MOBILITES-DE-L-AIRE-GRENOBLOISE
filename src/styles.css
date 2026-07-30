@@ -90,8 +90,9 @@ body {
 .pastille-liste span { display: block; width: 10px; height: 10px; border-radius: 50%; }
 
 .legende div { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
-.legende .trait { width: 22px; height: 4px; border-radius: 2px; flex: 0 0 22px; }
+.legende .trait { flex: 0 0 30px; display: block; }
 .legende em { margin-left: auto; color: var(--gris-fonce); font-style: normal; font-size: 12px; }
+.note-legende { color: var(--gris); font-size: 12px; margin-top: 8px; }
 
 .methode p { color: var(--gris-fonce); margin-bottom: 8px; }
 .methode .mention { font-size: 12px; color: var(--gris); }

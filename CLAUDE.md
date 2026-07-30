@@ -130,7 +130,23 @@ l'écran et 10 sur la planche jointe n'y verra pas une nuance de méthode.
 - **`base: './'`** dans `vite.config.js` : le dépôt a un nom très long, les
   chemins relatifs évitent d'avoir à le répéter dans la configuration.
 - **Rendu canvas** (`preferCanvas: true`) : les branches et les 1 202 tronçons
-  cyclables en SVG rament au zoom.
+  cyclables en SVG rament au zoom. **Une pane et un canevas par couche**
+  (`reseau` 400, `branches` 450, `surbrillance` 475), jamais `bringToBack()` objet
+  par objet : appliqué à chaque polyligne d'un groupe, il INVERSE l'empilement,
+  puisque chaque appel envoie l'objet tout au fond et que le dernier traité finit
+  dessous. Les liserés blancs, ajoutés avant leur trait, passaient donc par-dessus
+  lui : le réseau cyclable était bien rendu, en bandes blanchâtres. C'est l'origine
+  du « le réseau ne se voit pas très bien » du 30/07/2026, et non la teinte.
+  Contrôle : masquer la couche et comparer les deux captures, le p90 de l'écart de
+  luminance passe de 52 à 173 niveaux une fois les panes en place.
+- **Le réseau cyclable est monochrome**, anthracite `#3D4043`, ses cinq types
+  distingués par la graisse et le motif du trait (`AMENAGEMENTS` dans
+  `charte.js`), et la légende en tire ses échantillons pour ne pas pouvoir mentir.
+  Sur les planches ces types se distinguent par la couleur, mais la palette des
+  corridors sort de la même charte et les deux couches ne coexistent sur aucun
+  livrable : superposées, un aménagement bleu et le corridor B bleu sont
+  indiscernables. La couleur va donc aux corridors, qui sont le sujet, et la
+  légende dit cet écart avec la planche.
 - Le fond IGN vient de la **Géoplateforme, sans clé**. Les fonds sont atténués
   par filtre CSS, comme sur le SDE 35 et sur Crozon, pour que le réseau reste
   lisible sur le plan comme sur l'ortho sans changer de couleur.

@@ -1,4 +1,4 @@
-import { AMENAGEMENTS, FAMILLES } from './lib/charte.js'
+import { AMENAGEMENTS, FAMILLES, RESEAU, BLANC } from './lib/charte.js'
 
 /** Nombre décimal à la française : la virgule, sur une pièce de marché public. */
 function nb(v, d = 2) {
@@ -100,14 +100,27 @@ export default function Panneau({ donnees, resultat, depart, controle, survol,
       </details>
 
       <section className="legende">
-        <h2>Le réseau dessiné</h2>
+        <h2>Le réseau cyclable dessiné</h2>
         {AMENAGEMENTS.map((a) => (
           <div key={a.cle}>
-            <span className="trait" style={{ background: a.couleur }} />
+            {/* échantillon tiré des mêmes valeurs que la carte : la légende ne
+                peut pas mentir sur le trait qu'elle annonce */}
+            <svg className="trait" width="30" height="10" aria-hidden="true">
+              <line x1="1" y1="5" x2="29" y2="5" stroke={BLANC}
+                    strokeWidth={a.epaisseur + 2.4} strokeOpacity="0.85" />
+              <line x1="1" y1="5" x2="29" y2="5" stroke={RESEAU}
+                    strokeWidth={a.epaisseur}
+                    strokeDasharray={a.tirets || undefined} />
+            </svg>
             {a.nom}
             <em>{meta.km_amenagements[a.cle]} km</em>
           </div>
         ))}
+        <p className="note-legende">
+          Sur la planche jointe, ces cinq types se distinguent par la couleur.
+          Ici la couleur est réservée aux corridors, et le réseau se lit par la
+          graisse et le motif du trait.
+        </p>
       </section>
 
       <details className="methode">
