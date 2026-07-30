@@ -98,6 +98,7 @@ def main():
 
     u, v, L, cout, amenage = [], [], [], [], []
     traces = []
+    retournees = 0
     for a, b, d in r.G.edges(data=True):
         u.append(rang[a])
         v.append(rang[b])
@@ -105,7 +106,18 @@ def main():
         L.append(round(d["L"], 2))
         cout.append(round(d["cout"], 2))
         amenage.append(1 if d["amenage"] else 0)
-        traces.append(en_wgs(d["pts"], TOL_TRACE))
+        # La géométrie est orientée du premier sommet vers le second, une fois
+        # pour toutes. Sans cela, la page devrait DEVINER le sens de chaque
+        # tronçon pour les recoller, et un tronçon pris à l'envers dessine une
+        # corde à travers le paysage. `networkx` rend les extrémités dans un
+        # ordre qui n'est pas celui de la saisie : 31 % des géométries partent du
+        # second sommet.
+        pts = d["pts"]
+        if math.dist(pts[0], r.xy[a]) > math.dist(pts[0], r.xy[b]):
+            pts = pts[::-1]
+            retournees += 1
+        traces.append(en_wgs(pts, TOL_TRACE))
+    print("  géométries réorientées : %d sur %d" % (retournees, len(traces)))
 
     print("écriture ...")
     ecrire("graphe.json", {"lon": lon, "lat": lat, "u": u, "v": v,

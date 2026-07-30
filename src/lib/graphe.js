@@ -111,6 +111,19 @@ export function dijkstra(G, source) {
   return { dist, pere, pereArete }
 }
 
+/** Tracé d'une arête, orienté dans le sens où on la parcourt.
+ *
+ *  `geometrie.json` oriente chaque tronçon du premier vers le second sommet de
+ *  l'arête (`01_donnees_web.py`). Le sens de marche se lit donc sur le sommet
+ *  d'où l'on vient, sans avoir à comparer des distances : c'est ce qui garantit
+ *  qu'un tronçon ne se recolle jamais à l'envers.
+ */
+export function orienter(G, geometrie, e, depuis) {
+  const g = geometrie[e]
+  if (!g) return null
+  return G.u[e] === depuis ? g : g.slice().reverse()
+}
+
 /** Chemin du départ vers un sommet : suite de sommets et suite d'arêtes. */
 export function chemin(calcul, cible) {
   const sommets = [], aretes = []

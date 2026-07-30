@@ -26,6 +26,9 @@ CAPTURES = os.path.join(ICI, "_captures")
 
 TOL_MIN = 0.05      # demi-unité d'arrondi de la référence
 TOL_KM = 0.005
+# Les tronçons se suivent bout à bout : au raccord, il ne doit rester que
+# l'arrondi des coordonnées exportées (5 décimales, soit environ 1 m).
+TOL_RACCORD_M = 2.0
 
 
 def main():
@@ -40,9 +43,14 @@ def main():
         page.wait_for_function("() => window.__controle", timeout=60000)
         c = page.evaluate("() => window.__controle")
 
+        page.wait_for_function("() => window.__raccords", timeout=60000)
+        raccords = page.evaluate("() => window.__raccords")
+
         print("destinations comparées : %d" % c["n"])
         print("écart maximal          : %.3f min, %.4f km" % (c["ecartMin"], c["ecartKm"]))
         print("recalcul complet       : %d ms" % c["ms"])
+        print("pire raccord de tracé  : %.2f m (%s)"
+              % (raccords["m"], raccords["ou"] or "—"))
 
         page.wait_for_timeout(2500)
         page.screenshot(path=os.path.join(CAPTURES, "carte.png"))
@@ -66,6 +74,9 @@ def main():
         ennuis.append("seulement %d destinations atteintes" % c["n"])
     if c["ecartMin"] > TOL_MIN or c["ecartKm"] > TOL_KM:
         ennuis.append("écart au-delà de l'arrondi de la référence")
+    if raccords["m"] > TOL_RACCORD_M:
+        ennuis.append("tracés discontinus : %.1f m au raccord (%s)"
+                      % (raccords["m"], raccords["ou"]))
     if avant == apres:
         ennuis.append("déplacer le départ n'a rien changé aux chiffres")
     if erreurs:

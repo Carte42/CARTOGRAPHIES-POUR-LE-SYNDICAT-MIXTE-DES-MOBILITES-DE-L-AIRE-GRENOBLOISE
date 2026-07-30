@@ -1,6 +1,6 @@
 // Chargement des données et calcul complet depuis un point de départ.
 
-import { preparer, dijkstra, accrocher } from './graphe.js'
+import { preparer, dijkstra, accrocher, orienter } from './graphe.js'
 import { desservir, construireArbre, Corridors } from './corridors.js'
 
 const BASE = import.meta.env.BASE_URL
@@ -47,6 +47,33 @@ export function calculerDepuis(G, reference, meta, depart) {
     ms: Math.round(performance.now() - t0),
   }
   return { depart, calcul, dessertes, arbre, corridors, resume }
+}
+
+/** Pire écart entre deux tronçons consécutifs d'un itinéraire, sur toutes les
+ *  destinations.
+ *
+ *  C'est le contrôle du défaut qui a été signalé : un tronçon recollé à
+ *  l'envers ouvre un trou au raccord et dessine une corde en travers du
+ *  paysage, rivières comprises. Les tronçons se suivant bout à bout, cet écart
+ *  doit rester au niveau de l'arrondi des coordonnées.
+ */
+export function pireRaccord(G, geometrie, dessertes) {
+  let pire = 0, ou = null
+  for (const d of dessertes) {
+    let fin = null
+    for (let k = 0; k < d.chemin.aretes.length; k++) {
+      const g = orienter(G, geometrie, d.chemin.aretes[k], d.chemin.sommets[k])
+      if (!g || g.length < 2) continue
+      if (fin) {
+        const dx = (g[0][0] - fin[0]) * Math.cos((fin[1] * Math.PI) / 180) * 111320
+        const dy = (g[0][1] - fin[1]) * 111320
+        const ecart = Math.hypot(dx, dy)
+        if (ecart > pire) { pire = ecart; ou = d.carte }
+      }
+      fin = g[g.length - 1]
+    }
+  }
+  return { m: pire, ou }
 }
 
 export { accrocher }

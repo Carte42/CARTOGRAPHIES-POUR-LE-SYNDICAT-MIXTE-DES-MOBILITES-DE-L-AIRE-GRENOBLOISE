@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { BLANC, NOIR } from './lib/charte.js'
-import { AMENAGEMENTS } from './lib/charte.js'
+import { BLANC, NOIR, AMENAGEMENTS } from './lib/charte.js'
+import { orienter } from './lib/graphe.js'
 
 // Fonds de la Géoplateforme, sans clé. Ils sont atténués par filtre CSS : le
 // réseau doit rester lisible sur l'un comme sur l'autre sans changer de couleur.
@@ -27,36 +27,36 @@ const FONDS = {
   },
 }
 
-/** Remonte l'arbre de Dijkstra de `vers` jusqu'à `de` et rend le tracé. */
-function traceLiaison(calcul, geometrie, de, vers) {
+/** Remonte l'arbre de Dijkstra de `vers` jusqu'à `de` et rend les tronçons,
+ *  dans l'ordre de la marche et chacun dans le bon sens. */
+function traceLiaison(G, calcul, geometrie, de, vers) {
   const morceaux = []
   let x = vers
   while (x !== de && x !== -1) {
     const e = calcul.pereArete[x]
     if (e === -1) break
-    morceaux.push(geometrie[e])
-    x = calcul.pere[x]
+    const p = calcul.pere[x]
+    // on descend le père vers le fils : le tronçon part donc du père
+    morceaux.push(orienter(G, geometrie, e, p))
+    x = p
   }
+  morceaux.reverse()
   return morceaux
 }
 
-/** Une polyligne d'arêtes remises bout à bout : les arêtes sont exportées dans
- *  leur sens de saisie, il faut les retourner quand elles ne se raccordent pas. */
+/** Tronçons d'un itinéraire déjà connu par sa suite de sommets. */
+function traceChemin(G, geometrie, chemin) {
+  return chemin.aretes.map((e, k) => orienter(G, geometrie, e, chemin.sommets[k]))
+}
+
+/** Tronçons orientés remis bout à bout, en [lat, lon] pour Leaflet. Le point de
+ *  raccord n'est écrit qu'une fois. */
 function coudre(morceaux) {
   const out = []
   for (const m of morceaux) {
     if (!m || m.length < 2) continue
-    let pts = m
-    if (out.length) {
-      const dernier = out[out.length - 1]
-      const d0 = Math.hypot(dernier[1] - pts[0][1], dernier[0] - pts[0][0])
-      const d1 = Math.hypot(dernier[1] - pts[pts.length - 1][1],
-                            dernier[0] - pts[pts.length - 1][0])
-      if (d1 < d0) pts = [...pts].reverse()
-      out.push(...pts.slice(1).map((p) => [p[1], p[0]]))
-    } else {
-      out.push(...pts.map((p) => [p[1], p[0]]))
-    }
+    const debut = out.length ? 1 : 0
+    for (let i = debut; i < m.length; i++) out.push([m[i][1], m[i][0]])
   }
   return out
 }
@@ -133,7 +133,7 @@ export default function Carte({ donnees, geometrie, resultat, fond, reseau, surv
     const g = couches.current.branches
     g.clearLayers()
     for (const l of resultat.arbre.liaisons) {
-      const pts = coudre(traceLiaison(calcul, geometrie, l.de, l.vers))
+      const pts = coudre(traceLiaison(donnees.G, calcul, geometrie, l.de, l.vers))
       if (pts.length < 2) continue
       const k = corridors.sousDestinations(l.vers).length
       const poids = 2.6 + 0.9 * Math.sqrt(Math.max(k, 1))
@@ -180,7 +180,7 @@ export default function Carte({ donnees, geometrie, resultat, fond, reseau, surv
     if (cible === null || cible === undefined) return
     const d = resultat.dessertes.find((x) => x.i === cible)
     if (!d) return
-    const pts = coudre(d.chemin.aretes.map((e) => geometrie[e]))
+    const pts = coudre(traceChemin(donnees.G, geometrie, d.chemin))
     if (pts.length < 2) return
     L.polyline(pts, { color: NOIR, weight: 10, opacity: 0.28,
                       interactive: false, lineCap: 'round' }).addTo(g)

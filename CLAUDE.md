@@ -55,6 +55,19 @@ garantit que la planche et la page disent le même chiffre. Il écrit dans
 | `reference.json` | 48 destinations, 1 202 tronçons cyclables qualifiés | 0,04 Mo |
 | `meta.json` | vitesse, emprise, coefficients, contrôle Chrono-map | — |
 
+**Chaque tracé est orienté du premier vers le second sommet de son arête**, à
+l'écriture. `networkx` rend les extrémités d'une arête dans un ordre qui n'est
+pas celui de la saisie : **31 % des géométries partaient du second sommet**. Sans
+cette orientation, la page doit deviner le sens de chaque tronçon pour les
+recoller, et un tronçon pris à l'envers dessine une corde à travers le paysage.
+C'est l'origine du défaut signalé le 30/07/2026 (« les itinéraires passent sur
+des rivières ») : la couture comparait une extrémité en [lat, lon] à une autre en
+[lon, lat], donc lat contre lon, ce qui rendait le choix du sens arbitraire. Sur
+le seul itinéraire de Le Gua, **251 raccords sur 288 étaient disjoints**, jusqu'à
+1 159 m, et le tracé mesurait 32,8 km pour 23,4 km calculés. Ne jamais revenir à
+un choix de sens par comparaison de distances : le sens se déduit du parcours de
+l'arbre (`orienter()` dans `src/lib/graphe.js`).
+
 **La simplification à 3 m ne touche que le trait.** Les longueurs et les durées
 sont lues sur `graphe.json`, où aucune coordonnée n'est simplifiée : un
 Douglas-Peucker sur la géométrie perd jusqu'à 91 m sur une arête sinueuse, ce qui
@@ -85,8 +98,22 @@ projection.
 
 `scripts/02_controle.py` vérifie qu'au départ de la planche la page retrouve ses
 48 destinations **aux arrondis d'écriture près** (0,05 min et 5 m, soit la
-demi-unité d'arrondi de `temps_parcours.json`), que déplacer le départ change
-réellement les chiffres, et qu'aucune erreur de page n'est levée. Le risque de
+demi-unité d'arrondi de `temps_parcours.json`), que **le pire raccord entre deux
+tronçons reste sous 2 m** (il est à 0,00 m ; c'est le garde-fou du défaut
+ci-dessus, qu'aucun autre contrôle n'attrapait), que déplacer le départ change
+réellement les chiffres, et qu'aucune erreur de page n'est levée.
+
+**Ce qui n'est pas un défaut, et qu'il ne faut pas « corriger » :** des tronçons
+réellement rectilignes sur un kilomètre ou plus. Vérifié sur l'orthophoto : la
+digue rive gauche de l'Isère, les sentiers de Chartreuse (`highway=path` de 35 à
+153 nœuds, segments jusqu'à 530 m) et la véloroute longeant la voie ferrée vers
+Vif. Contrôle indépendant des franchissements d'eau : sur les 48 itinéraires,
+**22 croisements de rivière ou canal, dont 15 exactement sur un pont OSM**, et les
+deux cas les plus écartés vérifiés à la main (un canal busé sous la voirie
+d'Échirolles, un ruisseau franchi par un ouvrage non renseigné dans OSM près de
+Vif). Retirer les 49 tronçons droits de plus de 200 m du graphe ne changerait les
+durées que de 0,00 min en médiane et 0,06 min au p90 : le jeu n'en vaut pas la
+chandelle, et cela toucherait aussi les planches. Le risque de
 cette pièce n'est pas la panne, c'est le désaccord : un jury qui lit 12 minutes à
 l'écran et 10 sur la planche jointe n'y verra pas une nuance de méthode.
 

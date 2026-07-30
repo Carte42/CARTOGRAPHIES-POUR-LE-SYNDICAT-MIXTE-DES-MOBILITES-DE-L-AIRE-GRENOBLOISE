@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Carte, { FONDS } from './Carte.jsx'
 import Etoile from './Etoile.jsx'
 import Panneau from './Panneau.jsx'
-import { charger, calculerDepuis, accrocher } from './lib/calcul.js'
+import { charger, calculerDepuis, accrocher, pireRaccord } from './lib/calcul.js'
 
 export default function App() {
   const [donnees, setDonnees] = useState(null)
@@ -49,6 +49,15 @@ export default function App() {
                   resultat.dessertes.length, ecartMin.toFixed(3), ecartKm.toFixed(4))
     }
   }, [resultat, depart])
+
+  // Continuité des tracés : relevé par scripts/02_controle.py, en dev.
+  useEffect(() => {
+    if (!import.meta.env.DEV || !resultat || !geometrie) return
+    const r = pireRaccord(donnees.G, geometrie, resultat.dessertes)
+    window.__raccords = r
+    console.log('[raccords] pire écart entre deux tronçons : %s m (%s)',
+                r.m.toFixed(2), r.ou || '—')
+  }, [resultat, geometrie])
 
   function deplacer(lat, lon) {
     if (!donnees) return
